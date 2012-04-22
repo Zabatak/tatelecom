@@ -22,9 +22,11 @@ class Tatelecom_Controller extends Controller {
 	}
 
 	/**
-	 * Clickatell 2 way callback handler
-	 * @param string $key (Unique key that prevents unauthorized access)
-	 * @return void
+	 * tatelecom activation method
+	 * to test: http://localhost/tatelecom/activate/0100123456/123456
+	 * @param msisdn 11 number
+	 * @param code 8 numbers
+	 * @return 0 for verified, 1 for not found, 3 for already verified
 	 */
 
 	function activate($msisdn, $code) {
@@ -34,17 +36,14 @@ class Tatelecom_Controller extends Controller {
 		define("ER_CODE_NOT_FOUND", 1);
 		define("ER_CODE_ALREADY_VERIFIED", 3);
 		
-		$missing_info = FALSE;
+		$missing_info = TRUE;
 		$filter = " ";
 		$errno = ER_CODE_ALREADY_VERIFIED;
 		
 		if (isset($msisdn) AND ! empty($msisdn) AND isset($code) AND ! empty($code)){
 			$filter = "alert.alert_type=1 AND alert_code='" . strtoupper($code) . "' AND alert_recipient='" . $msisdn . "' ";
-			$missing_info = TRUE;
+			$missing_info = FALSE;
 		}
-		
-		//echo $msisdn;
-		//echo $code;
 
 		
 
@@ -64,6 +63,9 @@ class Tatelecom_Controller extends Controller {
 		} else {
 			$errno = ER_CODE_NOT_FOUND;
 		}
+		
+		//log everything
+		Kohana::log('debug', 'MSISDN: ' . $msisdn . ' code: ' . $code . ' => ' . $errno);
 		
 		die(''.$errno);
 
@@ -94,6 +96,43 @@ class Tatelecom_Controller extends Controller {
 				sms::add($message_from, $message_description, $message_to);
 
 			}
+		}
+	}
+	
+	
+	public function geocode(){
+		print_r( Tatelecom_Controller::reverse_geocode(30.039043,31.408539));
+		//30.040311,31.398298
+	}
+	
+	/**
+	 * Reverse Geocode a point
+	 *
+	 * @author
+	 * @param   double  $latitude
+	 * @param   double  $longitude
+	 * @return  string  closest approximation of the point as a display name
+	 */
+	public static function reverse_geocode($latitude,$longitude)
+	{
+		if ($latitude AND $longitude)
+		{
+			$url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='.$latitude.','.$longitude.'&sensor=false&language=ar';
+			$ch = curl_init();
+			curl_setopt($ch,CURLOPT_URL,$url);
+			curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+			curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
+			$json = curl_exec($ch);
+			curl_close($ch);
+
+			$location = json_decode($json, false);
+			print_r($location->results);
+
+			return $location->results[0]->formatted_address;
+		}
+		else
+		{
+			return false;
 		}
 	}
 
