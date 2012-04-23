@@ -46,6 +46,12 @@ class Tatelecom_Controller extends Controller {
 		}
 
 		
+	//validate code and msisdn
+            $validate = Validation::factory($this -> request)
+			->pre_filter('trim')
+			->add_rules('msisdn', 'numeric', 'length[11]')
+			->add_rules('code','numeric','length[4]');
+		
 
 		if (!$missing_info) {
 			$alert_check = ORM::factory('alert') -> where($filter) -> find();
