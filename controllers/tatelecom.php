@@ -99,6 +99,7 @@ class Tatelecom_Controller extends Controller {
                 // SET the alert as confirmed, and save it
                 $alert_check->set('alert_confirmed', 1)->save();
                 $errno = ER_CODE_VERIFIED;
+				sms::send($msisdn, 'ZabatakCom', 'SMS Service Activated Successfully. Thank you for using Zabatak.com');
             }
         } else {
             $errno = ER_CODE_NOT_FOUND;
