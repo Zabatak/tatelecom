@@ -38,6 +38,7 @@ class Tatelecom_Controller extends Controller {
         // Define error codes for this view.
         define("ER_CODE_VERIFIED", 0);
         define("ER_CODE_NOT_FOUND", 1);
+		define("ER_CODE_NOT_VALID", 2);
         define("ER_CODE_ALREADY_VERIFIED", 3);
 
 
@@ -60,35 +61,23 @@ class Tatelecom_Controller extends Controller {
          */
 
         //remove non nummeric from code var , if we have 1a2b3c4 result would be 1234
-        $new_string = preg_replace("/[^0-9]/", "", $code);
-        //echo $new_string;
-        $n_code = $new_string;
+        $code = preg_replace("/[^0-9]/", "", $code);
 
         $inputs[] = $msisdn;
-        $inputs[] = $n_code;
+        $inputs[] = $code;
 
         //print final values in array
         //print_r($inputs);
         $validate = new Validation($inputs);
-        $validate->pre_filter('trim');
-        $validate->add_rules('msisdn', 'numeric', 'length[12]');
-        $validate->add_rules('code', 'numeric', 'length[4]');
+        $validate->pre_filter('trim')
+        			->add_rules('msisdn', 'numeric', 'length[12]')
+        			->add_rules('code', 'numeric', 'length[4]');
+        
         // Test to see if things passed the rule checks
         if ($validate->validate()) {
-            // Yes! everything is valid , we need to send 0
-            Kohana::log('debug', 'Submission validated and submitted correctly');
-
-            $errno = ER_CODE_VERIFIED;
-        }
-        // No! We have validation errors, we need to send 1 for error
-        else {
-            $errno = ER_CODE_NOT_FOUND;
-            // populate the error fields, if any
-            Kohana::log('debug', 'Submission have some error , inputs was msisdn[' . $msisdn . '], code [' . $code . ']');
-        }
-
-        if ($missing_info) {
-            $alert_check = ORM::factory('alert')->where($filter)->find();
+            // Yes! everything is valid , we need to send 0		
+			$filter = "alert.alert_type=1 AND alert_code='" . strtoupper($code) . "' AND alert_recipient='" . $msisdn . "' ";
+			$alert_check = ORM::factory('alert')->where($filter)->find();
 
             // IF there was no result
             if (!$alert_check->loaded) {
@@ -101,14 +90,20 @@ class Tatelecom_Controller extends Controller {
                 $errno = ER_CODE_VERIFIED;
 				sms::send($msisdn, 'ZabatakCom', 'SMS Service Activated Successfully. Thank you for using Zabatak.com');
             }
-        } else {
-            $errno = ER_CODE_NOT_FOUND;
+			
         }
+        // No! We have validation errors, we need to send 1 for error
+        else {
+            $errno = ER_CODE_NOT_VALID;
+            // populate the error fields, if any
+            Kohana::log('debug', 'Submission have some error , inputs was msisdn[' . $msisdn . '], code [' . $code . ']');
+        }
+
 
         //log everything
         Kohana::log('debug', 'MSISDN: ' . $msisdn . ' code: ' . $code . ' => ' . $errno);
-        //print $errno;
-        die('' . $errno);
+        //print $errno and die
+        die('' . ($errno===0?0:1));
     }
 
     function index($key = NULL) {
