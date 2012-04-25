@@ -33,7 +33,7 @@ class Tatelecom_Sms_Provider implements Sms_Provider_Core {
 		$language=0;
 		$url = Kohana::config('tatelecom.url');
 		
-		$final_url = sprintf ($url, $ip, $to, $language, $message, $sender);
+		$final_url = sprintf ($url, $ip, $to, $language,rawurlencode($message), $sender);
 		
 
 		return $this->call_url($final_url);
@@ -58,7 +58,7 @@ class Tatelecom_Sms_Provider implements Sms_Provider_Core {
 			$xmlstr = curl_exec($ch);
 			$err = curl_errno( $ch );
 			curl_close($ch);
-			return $err;
+			return $xmlstr;
 	}
 	
 	
