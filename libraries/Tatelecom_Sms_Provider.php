@@ -58,7 +58,7 @@ class Tatelecom_Sms_Provider implements Sms_Provider_Core {
 			$xmlstr = curl_exec($ch);
 			$err = curl_errno( $ch );
 			curl_close($ch);
-			return true;
+			return $err;
 	}
 	
 	

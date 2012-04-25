@@ -79,11 +79,10 @@ class Tatelecom_Controller extends Controller {
 				// SET the alert as confirmed, and save it
 				$alert_check -> set('alert_confirmed', 1) -> save();
 				$errno = ER_CODE_VERIFIED;
-				if(sms::send($msisdn, 'ZabatakCom', 'SMS Service Activated Successfully. Thank you for using Zabatak.com')){
-					Kohana::log('debug', 'Confirmation SMS sent succesfully');
-				}else{
-					Kohana::log('error', 'Erorr sending SMS');
-				}
+				
+				$sms_result = sms::send($msisdn, 'ZabatakCom', 'SMS Service Activated Successfully. Thank you for using Zabatak.com');
+				Kohana::log('debug', 'SMS return message '. $sms_result);
+				
 			}
 
 		}
