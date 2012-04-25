@@ -144,7 +144,7 @@ class Tatelecom_Controller extends Controller {
 	
 	
 	public function test(){
-		sms::send('201001374126', 'zabatak', 'test');
+		echo sms::send('201001374126', 'zabatak', 'test') .'';
 		//sms::send($alertee->alert_recipient, $sms_from, $sms_message)
 	}
 	
