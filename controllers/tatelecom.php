@@ -26,7 +26,7 @@ class Tatelecom_Controller extends Controller {
 	 * to test: http://localhost/tatelecom/activate/0100123456/123456
 	 * @param msisdn 11 number
 	 * @param code 8 numbers
-	 * @return 0 for verified, 1 for not found, 3 for already verified
+	 * @return
 	 */
 
 	function activate($msisdn, $code) {
@@ -141,5 +141,40 @@ class Tatelecom_Controller extends Controller {
 			return false;
 		}
 	}
+	
+	
+	public function test(){
+		sms::send('201001374126', 'zabatak', 'test');
+		//sms::send($alertee->alert_recipient, $sms_from, $sms_message)
+	}
+	
+	/**
+    * Check for CURL PHP module
+    * @access private
+    */
+    function _chk_curl() {
+        if (!extension_loaded('curl')) {
+            return "This SMS API class can not work without CURL PHP module! Try using fopen sending method.";
+        }
+    }
+	
+	 /**
+    * CURL sending method
+    * @access private
+    */
+    function _curl($command) {
+        $this->_chk_curl();
+        $ch = curl_init ($command);
+        curl_setopt ($ch, CURLOPT_HEADER, 0);
+        curl_setopt ($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER,0);
+        if ($this->curl_use_proxy) {
+            curl_setopt ($ch, CURLOPT_PROXY, $this->curl_proxy);
+            curl_setopt ($ch, CURLOPT_PROXYUSERPWD, $this->curl_proxyuserpwd);
+        }
+        $result=curl_exec ($ch);
+        curl_close ($ch);
+        return $result;
+    }
 
 }

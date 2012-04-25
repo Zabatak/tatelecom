@@ -29,7 +29,7 @@ class tatelecom {
 	public function add()
 	{
 		// SMS Provider
-		//plugin::add_sms_provider("clickatell");
+		plugin::add_sms_provider("tatelecom");
 	}
 }
 
