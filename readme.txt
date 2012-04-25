@@ -1,5 +1,5 @@
 === About ===
-name: tatelecom
+name: TA-Telecom
 website: http://www.zabatak.com
 description: Send and Receive Text Messages Using tatelecom
 version: 0.1
@@ -14,6 +14,6 @@ Send and Receive Text Messages Using tatelecom.
 == Installation ==
 1. Copy the entire /ta-telecom/ directory into your /plugins/ directory.
 2. Activate the plugin.
-3. Click on the [settings] link to add your tatelecom information
+3. Click on the [settings] link to add your TA-Telecom information
 
 == Changelog ==
